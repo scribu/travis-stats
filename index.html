@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Travis CI build stats</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+	<h1>Travis CI build stats</h1>
+	<form>
+		<label>Repository:</label>
+		<input id="repo-name" type="text" value="wp-cli/wp-cli" />
+	</form>
+
+		<h2>Build durations over time</h2>
+		<div id="build-times"></div>
+
+	<script src="http://d3js.org/d3.v2.min.js"></script>
+	<script src="script.js"></script>
+</body>
+</html>

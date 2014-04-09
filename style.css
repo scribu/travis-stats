@@ -1,0 +1,13 @@
+form {
+	display: block;
+	margin-bottom: 10px;
+}
+
+.build-nr {
+	fill: blue;
+}
+
+.build-nr:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
