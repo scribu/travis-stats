@@ -3,6 +3,39 @@ form {
 	margin-bottom: 10px;
 }
 
+.button {
+	background-color: #428BCA;
+	border: 1px solid #357EBD;
+	border-radius: 2px;
+	color: #ffffff;
+	font-size: 15px;
+	font-weight: bold;
+	font-style: normal;
+	height: 30px;
+}
+.button:hover {
+	background-color: #3276B1;
+	border-color: #285E8E;
+	cursor: pointer;
+}
+.button:active {
+	position:relative;
+	top:1px;
+}
+
+#repo-name {
+	font-size: 15px;
+	font-weight: bold;
+	color: #50555B;
+	width: 300px;
+	height: 31px;
+	position: relative;
+	top: 1px;
+	border: 1px solid gray;
+	border-radius: 2px;
+	padding: 0 6px;
+}
+
 .column {
 	width: 49%;
 	float: left;
