@@ -3,6 +3,11 @@ form {
 	margin-bottom: 10px;
 }
 
+.column {
+	width: 49%;
+	float: left;
+}
+
 .build-nr {
 	fill: blue;
 }
