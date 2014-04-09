@@ -177,6 +177,11 @@ function updateChart() {
 	}
 
 	function filterBuilds(rawBuilds) {
+		if (typeof rawBuilds.length === 'undefined') {
+			alert('invalid repository: ' + repoName);
+			return;
+		}
+
 		var curOldestBuild = oldestBuild;
 
 		rawBuilds.forEach(function(build) {
