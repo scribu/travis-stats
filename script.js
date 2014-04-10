@@ -143,6 +143,12 @@ function getBuildDate(build) {
 
 function updateChart() {
 	var repoName = document.getElementById('repo-name').value;
+
+	// need at least "a/a"
+	if (repoName.length < 3) {
+		return;
+	}
+
 	var baseUrl = 'https://travis-ci.org/' + repoName + '/builds/';
 
 	var buildsUrl = 'https://api.travis-ci.org/repos/' + repoName + '/builds?event_type=push';
@@ -198,10 +204,22 @@ function updateChart() {
 	d3.json(buildsUrl, filterBuilds);
 }
 
-updateChart();
+function updateInputViaHash() {
+	document.getElementById('repo-name').value = window.location.hash.substr(1);
+}
+
+function updateHashViaInput() {
+	window.location.hash = '#' + document.getElementById('repo-name').value;
+}
+
+d3.select(window).on('hashchange', updateInputViaHash);
 
 d3.select('form').on('submit', function() {
 	d3.event.preventDefault();
 
+	updateHashViaInput();
 	updateChart();
 });
+
+updateInputViaHash();
+updateChart();
