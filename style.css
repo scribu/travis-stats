@@ -38,14 +38,11 @@ form {
 
 .column {
 	width: 49%;
+	min-width: 590px;
 	float: left;
 }
 
-.build-nr {
-	fill: blue;
-}
-
-.build-nr:hover {
+.build-time-bar:hover {
 	cursor: pointer;
-	text-decoration: underline;
+	stroke: gray;
 }
