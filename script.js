@@ -75,7 +75,7 @@ function renderBuildCounts(container, data) {
 		.style("stroke", "#000");
 }
 
-function renderBuildTimes(container, data, baseUrl) {
+function renderBuildTimes(container, barValue, data, baseUrl) {
 	var paddingLeft = 5; // space to the left of the bars
 	var paddingRight = 10; // space to the right of the bars
 	var barHeight = 5; // height of one bar
@@ -83,9 +83,6 @@ function renderBuildTimes(container, data, baseUrl) {
 	var gridLabelHeight = 18; // space reserved for gridline labels
 	var gridChartOffset = 3; // space between start of grid and first bar
 	var maxBarWidth = 450; // width of the bar with the max value
-
-	// accessor functions 
-	var barValue = function(d) { return d.duration/60; };
 
 	// scales
 	var yScale = d3.scale.ordinal()
@@ -192,7 +189,19 @@ function updateChart() {
 			builds.push(build);
 		});
 
-		renderBuildTimes('#build-times', builds, baseUrl);
+		function getDuration(build) {
+			return build.duration/60;
+		}
+
+		function getClockTime(build) {
+			var started_at = Date.parse(build.started_at);
+			var finished_at = Date.parse(build.finished_at);
+
+			return (finished_at - started_at) / 60000;
+		}
+
+		renderBuildTimes('#build-times-duration', getDuration, builds, baseUrl);
+		renderBuildTimes('#build-times', getClockTime, builds, baseUrl);
 		renderBuildCounts('#build-counts', d3.entries(buildCounts), baseUrl);
 
 		if (++i < n && curOldestBuild < oldestBuild) {
