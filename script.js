@@ -7,7 +7,7 @@ function renderBuildCounts(container, data) {
 	var gridChartOffset = 3; // space between start of grid and first bar
 	var maxBarWidth = 420; // width of the bar with the max value
 
-	// accessor functions 
+	// accessor functions
 	var barValue = function(d) { return d.value; };
 
 	// scales
@@ -23,7 +23,7 @@ function renderBuildCounts(container, data) {
 
 	// grid line labels
 	var gridContainer = chart.append('g')
-		.attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')'); 
+		.attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')');
 	gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
 		.attr("x", x)
 		.attr("dy", -3)
@@ -40,7 +40,7 @@ function renderBuildCounts(container, data) {
 
 	// bar labels
 	var labelsContainer = chart.append('g')
-		.attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+		.attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')');
 		labelsContainer.selectAll('text').data(data).enter().append('text')
 		.attr('y', yText)
 		.attr("dy", ".35em") // vertical-align: middle
@@ -49,7 +49,7 @@ function renderBuildCounts(container, data) {
 
 	// bars
 	var barsContainer = chart.append('g')
-		.attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+		.attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')');
 	barsContainer.selectAll("rect").data(data).enter().append("rect")
 		.attr('y', y)
 		.attr('height', yScale.rangeBand())
@@ -101,7 +101,7 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 
 	// grid line labels
 	var gridContainer = chart.append('g')
-		.attr('transform', 'translate(' + paddingLeft + ',' + gridLabelHeight + ')'); 
+		.attr('transform', 'translate(' + paddingLeft + ',' + gridLabelHeight + ')');
 	gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
 		.attr("x", x)
 		.attr("dy", -3)
@@ -118,7 +118,7 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 
 	// bars
 	var barsContainer = chart.append('g')
-		.attr('transform', 'translate(' + paddingLeft + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+		.attr('transform', 'translate(' + paddingLeft + ',' + (gridLabelHeight + gridChartOffset) + ')');
 	barsContainer.selectAll("rect").data(data).enter().append("rect")
 		.attr('y', y)
 		.attr('height', yScale.rangeBand())
@@ -146,9 +146,11 @@ function updateChart() {
 		return;
 	}
 
-	var baseUrl = 'https://travis-ci.org/' + repoName + '/builds/';
+	var baseUrl = 'https://magnum.travis-ci.com/' + repoName + '/builds/';
 
-	var buildsUrl = 'https://api.travis-ci.org/repos/' + repoName + '/builds?event_type=push';
+	var buildsUrl = 'https://api.travis-ci.com/repos/' + repoName + '/builds?event_type=push';
+
+	var TOKEN = 'YOUR TRAVIS TOKEN'; // http://docs.travis-ci.com/api/#authentication
 
 	var builds = [];
 
@@ -167,7 +169,15 @@ function updateChart() {
 		}
 	}
 
-	function filterBuilds(rawBuilds) {
+	function getTravisData(url, callback) {
+		d3.json(url).
+			header('Accept', 'application/vnd.travis-ci.2+json').
+			header('Authorization', 'token "' + TOKEN + '"').
+			get(callback);
+	}
+
+	function filterBuilds(err, data) {
+		var rawBuilds = data.builds;
 		if (typeof rawBuilds.length === 'undefined') {
 			alert('invalid repository: ' + repoName);
 			return;
@@ -175,13 +185,14 @@ function updateChart() {
 
 		var curOldestBuild = oldestBuild;
 
-		rawBuilds.forEach(function(build) {
+		rawBuilds.forEach(function(build, index) {
 			var buildNr = Number(build.number);
 			if (buildNr < curOldestBuild) {
 				curOldestBuild = buildNr;
 			}
 
-			if (build.branch !== 'master' || build.state !== 'finished') {
+			var commit = data.commits[index];
+			if (commit.branch !== 'master' || build.state !== 'passed') {
 				return;
 			}
 
@@ -206,11 +217,11 @@ function updateChart() {
 
 		if (++i < n && curOldestBuild < oldestBuild) {
 			oldestBuild = curOldestBuild;
-			d3.json(buildsUrl + '&after_number=' + oldestBuild, filterBuilds);
+			getTravisData(buildsUrl + '&after_number=' + oldestBuild, filterBuilds);
 		}
 	}
 
-	d3.json(buildsUrl, filterBuilds);
+	getTravisData(buildsUrl, filterBuilds);
 }
 
 function updateInputViaHash() {
