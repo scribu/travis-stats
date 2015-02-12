@@ -185,13 +185,14 @@ function updateChart() {
 
 		var curOldestBuild = oldestBuild;
 
-		rawBuilds.forEach(function(build) {
+		rawBuilds.forEach(function(build, index) {
 			var buildNr = Number(build.number);
 			if (buildNr < curOldestBuild) {
 				curOldestBuild = buildNr;
 			}
 
-			if (build.state !== 'passed') {
+			var commit = data.commits[index];
+			if (commit.branch !== 'master' || build.state !== 'passed') {
 				return;
 			}
 
