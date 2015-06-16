@@ -209,8 +209,10 @@ function updateChart() {
 			d3.json(buildsUrl + '&after_number=' + oldestBuild, filterBuilds);
 		}
 	}
-
-	d3.json(buildsUrl, filterBuilds);
+ 	var token = params.substr( params.indexOf( 'access_token' ) )
+			            .split( '&' )[0]
+			            .split( '=' )[1];
+	d3.json(buildsUrl, filterBuilds).header( 'Authorization', 'BEARER ' + decodeURIComponent( token ) );
 }
 
 function updateInputViaHash() {
