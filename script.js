@@ -1,5 +1,6 @@
 var travis_endpoint = 'travis-ci.org';
 var travis_api_endpoint = 'api.travis-ci.org';
+var travis_api_token = false;
 
 d3.round = function(x, n) { var ten_n = Math.pow(10,n); return Math.round(x * ten_n) / ten_n; }
 
@@ -145,6 +146,8 @@ function getBuildDate(build) {
 
 function updateChart() {
 	var repoName = document.getElementById('repo-name').value;
+	travis_endpoint = document.getElementById('travis-url').value || travis_endpoint;
+	travis_api_endpoint = document.getElementById('travis-api-url').value || travis_api_endpoint;
 
 	// need at least "a/a"
 	if (repoName.length < 3) {
@@ -211,11 +214,21 @@ function updateChart() {
 
 		if (++i < n && curOldestBuild < oldestBuild) {
 			oldestBuild = curOldestBuild;
-			d3.json(buildsUrl + '&after_number=' + oldestBuild, filterBuilds);
+			retrieveJson(buildsUrl + '&after_number=' + oldestBuild, filterBuilds);
 		}
 	}
 
-	d3.json(buildsUrl, filterBuilds);
+	retrieveJson(buildsUrl, filterBuilds);
+}
+
+function retrieveJson(url, callback) {
+	var maybeToken = document.getElementById('travis-api-token').value || travis_api_token;
+
+	var req = d3.json(url);
+	if(maybeToken){
+		req = req.header("Authorization", 'token ' + maybeToken);
+	}
+	req.get(callback);
 }
 
 function updateInputViaHash() {
