@@ -1,6 +1,9 @@
-var travis_endpoint = 'travis-ci.org';
-var travis_api_endpoint = 'api.travis-ci.org';
-var travis_api_token = false;
+var defaultConfig = {
+	travis_endpoint: 'travis-ci.org',
+	travis_api_endpoint: 'api.travis-ci.org',
+	travis_api_token: false,
+}
+var config;
 
 d3.round = function(x, n) { var ten_n = Math.pow(10,n); return Math.round(x * ten_n) / ten_n; }
 
@@ -146,17 +149,15 @@ function getBuildDate(build) {
 
 function updateChart() {
 	var repoName = document.getElementById('repo-name').value;
-	travis_endpoint = document.getElementById('travis-url').value || travis_endpoint;
-	travis_api_endpoint = document.getElementById('travis-api-url').value || travis_api_endpoint;
 
 	// need at least "a/a"
 	if (repoName.length < 3) {
 		return;
 	}
 
-	var baseUrl = 'https://' + travis_endpoint + '/' + repoName + '/builds/';
+	var baseUrl = 'https://' + config.travis_endpoint + '/' + repoName + '/builds/';
 
-	var buildsUrl = 'https://' + travis_api_endpoint + '/repos/' + repoName + '/builds?event_type=push';
+	var buildsUrl = 'https://' + config.travis_api_endpoint + '/repos/' + repoName + '/builds?event_type=push';
 
 	var builds = [];
 
@@ -222,11 +223,9 @@ function updateChart() {
 }
 
 function retrieveJson(url, callback) {
-	var maybeToken = document.getElementById('travis-api-token').value || travis_api_token;
-
 	var req = d3.json(url);
-	if(maybeToken){
-		req = req.header("Authorization", 'token ' + maybeToken);
+	if (config.travis_api_token) {
+		req = req.header("Authorization", 'token ' + config.travis_api_token);
 	}
 	req.get(callback);
 }
@@ -248,5 +247,18 @@ d3.select('form').on('submit', function() {
 	updateChart();
 });
 
+function getConfigUrl() {
+	return location.pathname.replace('index.html', '') + 'config.json';
+}
+
 updateInputViaHash();
-updateChart();
+
+d3.json(getConfigUrl())
+	.on('error', function(error) {
+		config = defaultConfig;
+	})
+	.on('load', function(response) {
+		config = response;
+		updateChart();
+	})
+	.get();
