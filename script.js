@@ -232,11 +232,21 @@ function retrieveJson(url, callback) {
 }
 
 function updateInputViaHash() {
-	document.getElementById('repo-name').value = window.location.hash.substr(1);
+	var data = JSON.parse(window.location.hash.substr(1));
+	document.getElementById('repo-name').value = data.repo;
+	document.getElementById('travis-url').value = data.travis_endpoint;
+	document.getElementById('travis-api-url').value = data.travis_api_endpoint;
+	document.getElementById('travis-api-token').value = data.travis_api_token;
 }
 
 function updateHashViaInput() {
-	window.location.hash = '#' + document.getElementById('repo-name').value;
+	var data = {
+		repo: document.getElementById('repo-name').value,
+		travis_endpoint: document.getElementById('travis-url').value,
+		travis_api_endpoint: document.getElementById('travis-api-url').value,
+		travis_api_token: document.getElementById('travis-api-token').value
+	};
+	window.location.hash = '#' + JSON.stringify(data);
 }
 
 d3.select(window).on('hashchange', updateInputViaHash);
