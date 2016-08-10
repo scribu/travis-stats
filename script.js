@@ -1,3 +1,6 @@
+var travis_endpoint = 'travis-ci.org';
+var travis_api_endpoint = 'api.travis-ci.org';
+
 d3.round = function(x, n) { var ten_n = Math.pow(10,n); return Math.round(x * ten_n) / ten_n; }
 
 function renderBuildCounts(container, data) {
@@ -148,9 +151,9 @@ function updateChart() {
 		return;
 	}
 
-	var baseUrl = 'https://travis-ci.org/' + repoName + '/builds/';
+	var baseUrl = 'https://' + travis_endpoint + '/' + repoName + '/builds/';
 
-	var buildsUrl = 'https://api.travis-ci.org/repos/' + repoName + '/builds?event_type=push';
+	var buildsUrl = 'https://' + travis_api_endpoint + '/repos/' + repoName + '/builds?event_type=push';
 
 	var builds = [];
 
