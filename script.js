@@ -25,6 +25,8 @@ function renderBuildCounts(container, data) {
 	var yText = function(d, i) { return y(d, i) + yScale(1) / 2; };
 	var x = d3.scaleLinear().domain([0, d3.max(data, barValue)]).range([0, maxBarWidth]);
 
+	var maxY = yScale.domain().pop();
+
 	// svg container element
 	var chart = d3.select(container).html('').append("svg")
 		.attr('width', maxBarWidth + barLabelWidth + valueLabelWidth)
@@ -44,7 +46,7 @@ function renderBuildCounts(container, data) {
 		.attr("x1", x)
 		.attr("x2", x)
 		.attr("y1", 0)
-		.attr("y2", yScale(1) + gridChartOffset)
+		.attr("y2", yScale(maxY) + gridChartOffset)
 		.style("stroke", "#ccc");
 
 	// bar labels
@@ -80,7 +82,7 @@ function renderBuildCounts(container, data) {
 	// start line
 	barsContainer.append("line")
 		.attr("y1", -gridChartOffset)
-		.attr("y2", yScale(1) + gridChartOffset)
+		.attr("y2", yScale(maxY) + gridChartOffset)
 		.style("stroke", "#000");
 }
 
@@ -103,6 +105,8 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 		.domain([0, d3.max(data, barValue)])
 		.range([0, maxBarWidth]);
 
+  var maxY = yScale.domain().pop();
+
 	// svg container element
 	var chart = d3.select(container).html('').append("svg")
 		.attr('width', maxBarWidth + paddingLeft + paddingRight)
@@ -122,7 +126,7 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 		.attr("x1", x)
 		.attr("x2", x)
 		.attr("y1", 0)
-		.attr("y2", yScale(1) + gridChartOffset + barPaddingV*data.length)
+		.attr("y2", yScale(maxY) + gridChartOffset + barPaddingV*data.length)
 		.style("stroke", "#ccc");
 
 	// bars
