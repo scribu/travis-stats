@@ -1,3 +1,12 @@
+var defaultConfig = {
+	travis_endpoint: 'travis-ci.org',
+	travis_api_endpoint: 'api.travis-ci.org',
+	travis_api_token: false,
+}
+var config;
+
+d3.round = function(x, n) { var ten_n = Math.pow(10,n); return Math.round(x * ten_n) / ten_n; }
+
 function renderBuildCounts(container, data) {
 	var valueLabelWidth = 40; // space reserved for value labels (right)
 	var barHeight = 20; // height of one bar
@@ -7,14 +16,14 @@ function renderBuildCounts(container, data) {
 	var gridChartOffset = 3; // space between start of grid and first bar
 	var maxBarWidth = 420; // width of the bar with the max value
 
-	// accessor functions 
+	// accessor functions
 	var barValue = function(d) { return d.value; };
 
 	// scales
-	var yScale = d3.scale.ordinal().domain(d3.range(0, data.length)).rangeBands([0, data.length * barHeight]);
+	var yScale = d3.scaleBand().domain(d3.range(0, data.length)).range([0, data.length * barHeight]);
 	var y = function(d, i) { return yScale(i); };
-	var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
-	var x = d3.scale.linear().domain([0, d3.max(data, barValue)]).range([0, maxBarWidth]);
+	var yText = function(d, i) { return y(d, i) + yScale(1) / 2; };
+	var x = d3.scaleLinear().domain([0, d3.max(data, barValue)]).range([0, maxBarWidth]);
 
 	// svg container element
 	var chart = d3.select(container).html('').append("svg")
@@ -23,7 +32,7 @@ function renderBuildCounts(container, data) {
 
 	// grid line labels
 	var gridContainer = chart.append('g')
-		.attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')'); 
+		.attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')');
 	gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
 		.attr("x", x)
 		.attr("dy", -3)
@@ -35,12 +44,12 @@ function renderBuildCounts(container, data) {
 		.attr("x1", x)
 		.attr("x2", x)
 		.attr("y1", 0)
-		.attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
+		.attr("y2", yScale(1) + gridChartOffset)
 		.style("stroke", "#ccc");
 
 	// bar labels
 	var labelsContainer = chart.append('g')
-		.attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+		.attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')');
 		labelsContainer.selectAll('text').data(data).enter().append('text')
 		.attr('y', yText)
 		.attr("dy", ".35em") // vertical-align: middle
@@ -49,10 +58,10 @@ function renderBuildCounts(container, data) {
 
 	// bars
 	var barsContainer = chart.append('g')
-		.attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+		.attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')');
 	barsContainer.selectAll("rect").data(data).enter().append("rect")
 		.attr('y', y)
-		.attr('height', yScale.rangeBand())
+		.attr('height', yScale(1))
 		.attr('width', function(d) { return x(barValue(d)); })
 		.attr('stroke', 'white')
 		.attr('fill', 'steelblue');
@@ -71,7 +80,7 @@ function renderBuildCounts(container, data) {
 	// start line
 	barsContainer.append("line")
 		.attr("y1", -gridChartOffset)
-		.attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
+		.attr("y2", yScale(1) + gridChartOffset)
 		.style("stroke", "#000");
 }
 
@@ -85,12 +94,12 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 	var maxBarWidth = 450; // width of the bar with the max value
 
 	// scales
-	var yScale = d3.scale.ordinal()
+	var yScale = d3.scaleBand()
 		.domain(d3.range(0, data.length))
-		.rangeBands([0, data.length * (barHeight+barPaddingV)]);
+		.range([0, data.length * (barHeight+barPaddingV)]);
 	var y = function(d, i) { return yScale(i) + barPaddingV*i; };
 	var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
-	var x = d3.scale.linear()
+	var x = d3.scaleLinear()
 		.domain([0, d3.max(data, barValue)])
 		.range([0, maxBarWidth]);
 
@@ -101,7 +110,7 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 
 	// grid line labels
 	var gridContainer = chart.append('g')
-		.attr('transform', 'translate(' + paddingLeft + ',' + gridLabelHeight + ')'); 
+		.attr('transform', 'translate(' + paddingLeft + ',' + gridLabelHeight + ')');
 	gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
 		.attr("x", x)
 		.attr("dy", -3)
@@ -113,15 +122,15 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 		.attr("x1", x)
 		.attr("x2", x)
 		.attr("y1", 0)
-		.attr("y2", yScale.rangeExtent()[1] + gridChartOffset + barPaddingV*data.length)
+		.attr("y2", yScale(1) + gridChartOffset + barPaddingV*data.length)
 		.style("stroke", "#ccc");
 
 	// bars
 	var barsContainer = chart.append('g')
-		.attr('transform', 'translate(' + paddingLeft + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+		.attr('transform', 'translate(' + paddingLeft + ',' + (gridLabelHeight + gridChartOffset) + ')');
 	barsContainer.selectAll("rect").data(data).enter().append("rect")
 		.attr('y', y)
-		.attr('height', yScale.rangeBand())
+		.attr('height', yScale(1))
 		.attr('width', function(d) { return x(barValue(d)); })
 		.attr('stroke', 'white')
 		.attr('class', 'build-time-bar')
@@ -146,9 +155,9 @@ function updateChart() {
 		return;
 	}
 
-	var baseUrl = 'https://travis-ci.org/' + repoName + '/builds/';
+	var baseUrl = 'https://' + config.travis_endpoint + '/' + repoName + '/builds/';
 
-	var buildsUrl = 'https://api.travis-ci.org/repos/' + repoName + '/builds?event_type=push';
+	var buildsUrl = 'https://' + config.travis_api_endpoint + '/repos/' + repoName + '/builds?event_type=push';
 
 	var builds = [];
 
@@ -206,11 +215,19 @@ function updateChart() {
 
 		if (++i < n && curOldestBuild < oldestBuild) {
 			oldestBuild = curOldestBuild;
-			d3.json(buildsUrl + '&after_number=' + oldestBuild, filterBuilds);
+			retrieveJson(buildsUrl + '&after_number=' + oldestBuild, filterBuilds);
 		}
 	}
 
-	d3.json(buildsUrl, filterBuilds);
+	retrieveJson(buildsUrl, filterBuilds);
+}
+
+function retrieveJson(url, callback) {
+	var req = d3.json(url);
+	if (config.travis_api_token) {
+		req = req.header("Authorization", 'token ' + config.travis_api_token);
+	}
+	req.get(callback);
 }
 
 function updateInputViaHash() {
@@ -230,5 +247,18 @@ d3.select('form').on('submit', function() {
 	updateChart();
 });
 
+function getConfigUrl() {
+	return location.pathname.replace('index.html', '') + 'config.json';
+}
+
 updateInputViaHash();
-updateChart();
+
+d3.json(getConfigUrl())
+	.on('error', function(error) {
+		config = defaultConfig;
+	})
+	.on('load', function(response) {
+		config = response;
+		updateChart();
+	})
+	.get();
