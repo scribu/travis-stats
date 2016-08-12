@@ -105,7 +105,7 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 		.domain([0, d3.max(data, barValue)])
 		.range([0, maxBarWidth]);
 
-  var maxY = yScale.domain().pop();
+        var maxY = yScale.domain().pop();
 
 	// svg container element
 	var chart = d3.select(container).html('').append("svg")
