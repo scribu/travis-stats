@@ -165,6 +165,19 @@ function isValidBuild(build) {
 	return build.branch === 'master' && build.state === 'finished';
 }
 
+// Build clock time, in minutes.
+function getClockTime(build) {
+	var started_at = Date.parse(build.started_at);
+	var finished_at = Date.parse(build.finished_at);
+
+	return (finished_at - started_at) / 60000;
+}
+
+// Build duration, in minutes.
+function getDuration(build) {
+	return build.duration / 60;
+}
+
 function updateChart() {
 	var repoName = document.getElementById('repo-name').value;
 
@@ -203,17 +216,6 @@ function updateChart() {
 				updateBuildCounts(buildCounts, build);
 			}
 		});
-
-		function getDuration(build) {
-			return build.duration/60;
-		}
-
-		function getClockTime(build) {
-			var started_at = Date.parse(build.started_at);
-			var finished_at = Date.parse(build.finished_at);
-
-			return (finished_at - started_at) / 60000;
-		}
 
 		renderBuildTimes('#build-times-duration', getDuration, builds, baseUrl);
 		renderBuildTimes('#build-times', getClockTime, builds, baseUrl);
