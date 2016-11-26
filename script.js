@@ -178,6 +178,49 @@ function getDuration(build) {
 	return build.duration / 60;
 }
 
+function retrieveJson(url, callback) {
+	var req = d3.json(url);
+	if (config.travis_api_token) {
+		req = req.header("Authorization", 'token ' + config.travis_api_token);
+	}
+	req.get(callback);
+}
+
+/**
+ * Iterate over builds retrieved from Travis CI.
+ *
+ * @param {String} repoName - The repository name.
+ * @param {Number} maxRequests - How many API requests to make. 
+ * @param {Function} cb - Called once for each API response.
+ */
+function iterBuilds(repoName, maxRequests, cb) {
+	var buildsUrl = 'https://' + config.travis_api_endpoint + '/repos/' + repoName + '/builds?event_type=push';
+
+	var i=0;
+
+	var oldestBuild = Infinity;
+
+	function handleResponse(rawBuilds) {
+		if (typeof rawBuilds.length === 'undefined') {
+			alert('invalid repository: ' + repoName);
+			return;
+		}
+
+		var curOldestBuild = Math.min.apply(null, rawBuilds.map(function(build) {
+			return parseInt(build.number, 10);
+		}));
+
+		cb(rawBuilds);
+
+		if (++i < maxRequests && curOldestBuild < oldestBuild) {
+			oldestBuild = curOldestBuild;
+			retrieveJson(buildsUrl + '&after_number=' + oldestBuild, handleResponse);
+		}
+	}
+
+	retrieveJson(buildsUrl, handleResponse);
+}
+
 function updateChart() {
 	var repoName = document.getElementById('repo-name').value;
 
@@ -188,29 +231,12 @@ function updateChart() {
 
 	var baseUrl = 'https://' + config.travis_endpoint + '/' + repoName + '/builds/';
 
-	var buildsUrl = 'https://' + config.travis_api_endpoint + '/repos/' + repoName + '/builds?event_type=push';
-
 	var builds = [];
-
-	var oldestBuild = Infinity;
-	var i=0, n=20;
 
 	var buildCounts = {};
 
 	function filterBuilds(rawBuilds) {
-		if (typeof rawBuilds.length === 'undefined') {
-			alert('invalid repository: ' + repoName);
-			return;
-		}
-
-		var curOldestBuild = oldestBuild;
-
 		rawBuilds.forEach(function(build) {
-			var buildNr = Number(build.number);
-			if (buildNr < curOldestBuild) {
-				curOldestBuild = buildNr;
-			}
-
 			if (isValidBuild(build)) {
 				builds.push(build);
 				updateBuildCounts(buildCounts, build);
@@ -220,22 +246,9 @@ function updateChart() {
 		renderBuildTimes('#build-times-duration', getDuration, builds, baseUrl);
 		renderBuildTimes('#build-times', getClockTime, builds, baseUrl);
 		renderBuildCounts('#build-counts', d3.entries(buildCounts), baseUrl);
-
-		if (++i < n && curOldestBuild < oldestBuild) {
-			oldestBuild = curOldestBuild;
-			retrieveJson(buildsUrl + '&after_number=' + oldestBuild, filterBuilds);
-		}
 	}
 
-	retrieveJson(buildsUrl, filterBuilds);
-}
-
-function retrieveJson(url, callback) {
-	var req = d3.json(url);
-	if (config.travis_api_token) {
-		req = req.header("Authorization", 'token ' + config.travis_api_token);
-	}
-	req.get(callback);
+	iterBuilds(repoName, 20, filterBuilds);
 }
 
 function updateInputViaHash() {
