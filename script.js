@@ -29,14 +29,14 @@ function renderBuildCounts(container, data) {
 
 	var maxY = yScale.domain().pop();
 
-	var ticks = x.ticks(maxValue > 1 ? 10 : 1);
-
 	// svg container element
 	var chart = d3.select(container).html('').append("svg")
 		.attr('width', maxBarWidth + barLabelWidth + valueLabelWidth)
 		.attr('height', gridLabelHeight + gridChartOffset + data.length * barHeight);
 
 	// grid line labels
+	var ticks = x.ticks(maxValue >= 10 ? 10 : maxValue);
+
 	var gridContainer = chart.append('g')
 		.attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')');
 	gridContainer.selectAll("text").data(ticks).enter().append("text")
@@ -73,17 +73,6 @@ function renderBuildCounts(container, data) {
 		.attr('width', function(d) { return x(barValue(d)); })
 		.attr('stroke', 'white')
 		.attr('fill', 'steelblue');
-
-	// bar value labels
-	barsContainer.selectAll("text").data(data).enter().append("text")
-		.attr("x", function(d) { return x(barValue(d)); })
-		.attr("y", yText)
-		.attr("dx", 3) // padding-left
-		.attr("dy", ".35em") // vertical-align: middle
-		.attr("text-anchor", "start") // text-align: right
-		.attr("fill", "black")
-		.attr("stroke", "none")
-		.text(function(d) { return d3.round(barValue(d), 2); });
 
 	// start line
 	barsContainer.append("line")
