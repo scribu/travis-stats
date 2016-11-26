@@ -236,11 +236,13 @@ function updateChart() {
 	var buildCounts = {};
 
 	function filterBuilds(rawBuilds) {
-		rawBuilds.forEach(function(build) {
-			if (isValidBuild(build)) {
-				builds.push(build);
-				updateBuildCounts(buildCounts, build);
-			}
+		var filteredBuilds = rawBuilds.filter(isValidBuild);
+
+		if (!filteredBuilds.length) return;
+
+		filteredBuilds.forEach(function(build) {
+			builds.push(build);
+			updateBuildCounts(buildCounts, build);
 		});
 
 		renderBuildTimes('#build-times-duration', getDuration, builds, baseUrl);
