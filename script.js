@@ -183,10 +183,6 @@ function updateBuildCounts(buildCounts, build) {
 	}
 }
 
-function isValidBuild(build) {
-	return build.branch === 'master' && build.state === 'finished';
-}
-
 // Build clock time, in seconds.
 function getClockTime(build) {
 	var started_at = Date.parse(build.started_at);
@@ -244,11 +240,15 @@ function iterBuilds(repoName, maxRequests, cb) {
 }
 
 function updateChart() {
-	var repoName = document.getElementById('repo-name').value;
-
+	var repoName = document.getElementById('repository').value;
 	// need at least "a/a"
 	if (repoName.length < 3) {
 		return;
+	}
+
+	var branch = document.getElementById('branch').value;
+	if (!branch.length) {
+		alert('Need to give a branch name.');
 	}
 
 	var baseUrl = 'https://' + config.travis_endpoint + '/' + repoName + '/builds/';
@@ -256,6 +256,10 @@ function updateChart() {
 	var builds = [];
 
 	var buildCounts = {};
+
+	function isValidBuild(build) {
+		return build.branch === branch && build.state === 'finished';
+	}
 
 	function filterBuilds(rawBuilds) {
 		var filteredBuilds = rawBuilds.filter(isValidBuild);
@@ -276,11 +280,11 @@ function updateChart() {
 }
 
 function updateInputViaHash() {
-	document.getElementById('repo-name').value = window.location.hash.substr(1);
+	document.getElementById('repository').value = window.location.hash.substr(1);
 }
 
 function updateHashViaInput() {
-	window.location.hash = '#' + document.getElementById('repo-name').value;
+	window.location.hash = '#' + document.getElementById('repository').value;
 }
 
 d3.select(window).on('hashchange', updateInputViaHash);
