@@ -280,11 +280,33 @@ function updateChart() {
 }
 
 function updateInputViaHash() {
-	document.getElementById('repository').value = window.location.hash.substr(1);
+	var parts = window.location.hash.substr(1).split('/');
+
+	if (parts.length === 1) {
+		return;
+	}
+
+	document.getElementById('repository').value = parts[0] + '/' + parts[1]; 
+
+	if (parts[2]) {
+		document.getElementById('branch').value = parts[2];
+	}
 }
 
 function updateHashViaInput() {
-	window.location.hash = '#' + document.getElementById('repository').value;
+	var repository = document.getElementById('repository').value;
+	if (!repository) {
+		return;
+	}
+
+	var value = repository;
+
+	var branch = document.getElementById('branch').value;
+	if (branch) {
+		value += '/' + branch;
+	}
+
+	window.location.hash = '#' + value;
 }
 
 d3.select(window).on('hashchange', updateInputViaHash);
