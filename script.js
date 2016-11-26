@@ -151,6 +151,20 @@ function getBuildDate(build) {
 	return dt.toDateString();
 }
 
+function updateBuildCounts(buildCounts, build) {
+	var buildDate = getBuildDate(build);
+
+	if (!buildCounts[buildDate]) {
+		buildCounts[buildDate] = 1;
+	} else {
+		buildCounts[buildDate] += 1;
+	}
+}
+
+function isValidBuild(build) {
+	return build.branch === 'master' && build.state === 'finished';
+}
+
 function updateChart() {
 	var repoName = document.getElementById('repo-name').value;
 
@@ -170,16 +184,6 @@ function updateChart() {
 
 	var buildCounts = {};
 
-	function updateCount(build) {
-		var buildDate = getBuildDate(build);
-
-		if (!buildCounts[buildDate]) {
-			buildCounts[buildDate] = 1;
-		} else {
-			buildCounts[buildDate] += 1;
-		}
-	}
-
 	function filterBuilds(rawBuilds) {
 		if (typeof rawBuilds.length === 'undefined') {
 			alert('invalid repository: ' + repoName);
@@ -194,12 +198,10 @@ function updateChart() {
 				curOldestBuild = buildNr;
 			}
 
-			if (build.branch !== 'master' || build.state !== 'finished') {
-				return;
+			if (isValidBuild(build)) {
+				builds.push(build);
+				updateBuildCounts(buildCounts, build);
 			}
-
-			updateCount(build);
-			builds.push(build);
 		});
 
 		function getDuration(build) {
