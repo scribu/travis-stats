@@ -3,16 +3,19 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Travis CI build stats</title>
-	<link rel="stylesheet" href="style.css?v=2" />
+	<link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
 	<h1>Travis CI build stats</h1>
 	<form>
-		<label for="repository">Repository:</label>
+		<label for="repository" title="The Github repository to look at.">Repository:</label>
 		<input id="repository" type="text" placeholder="owner/repo" />
 
-		<label for="branch">Branch:</label>
+		<label for="branch" title="The git branch to display builds for.">Branch:</label>
 		<input id="branch" type="text" value="master" />
+
+		<label for="requests" title="The Travis CI API only returns 25 builds at a time.">API Requests:</label>
+		<input id="requests" type="number" value="30" />
 
 		<input class="button" type="submit" value="Render" />
 	</form>
@@ -35,7 +38,7 @@
 	</div>
 
 	<script src="d3.v4.min.js"></script>
-	<script src="script.js?v=2"></script>
+	<script src="script.js?v=3"></script>
 
 	<a href="https://github.com/scribu/travis-stats"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
 </body>

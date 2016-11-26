@@ -32,7 +32,8 @@ form {
 	top:1px;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="number"] {
 	font-size: 15px;
 	font-weight: bold;
 	color: #50555B;
@@ -43,6 +44,10 @@ input[type="text"] {
 	border: 1px solid gray;
 	border-radius: 2px;
 	padding: 0 6px;
+}
+
+#requests {
+	width: 3em;
 }
 
 .column {

@@ -251,6 +251,8 @@ function updateChart() {
 		alert('Need to give a branch name.');
 	}
 
+	var reqCount = document.getElementById('requests').value;
+
 	var baseUrl = 'https://' + config.travis_endpoint + '/' + repoName + '/builds/';
 
 	var builds = [];
@@ -276,7 +278,7 @@ function updateChart() {
 		renderBuildCounts('#build-counts', d3.entries(buildCounts), baseUrl);
 	}
 
-	iterBuilds(repoName, 20, filterBuilds);
+	iterBuilds(repoName, reqCount, filterBuilds);
 }
 
 function updateInputViaHash() {
