@@ -19,13 +19,17 @@ function renderBuildCounts(container, data) {
 	// accessor functions
 	var barValue = function(d) { return d.value; };
 
+	var maxValue = d3.max(data, barValue);
+
 	// scales
 	var yScale = d3.scaleBand().domain(d3.range(0, data.length)).range([0, data.length * barHeight]);
 	var y = function(d, i) { return yScale(i); };
 	var yText = function(d, i) { return y(d, i) + yScale(1) / 2; };
-	var x = d3.scaleLinear().domain([0, d3.max(data, barValue)]).range([0, maxBarWidth]);
+	var x = d3.scaleLinear().domain([0, maxValue]).range([0, maxBarWidth]);
 
 	var maxY = yScale.domain().pop();
+
+	var ticks = x.ticks(maxValue > 1 ? 10 : 1);
 
 	// svg container element
 	var chart = d3.select(container).html('').append("svg")
@@ -35,14 +39,14 @@ function renderBuildCounts(container, data) {
 	// grid line labels
 	var gridContainer = chart.append('g')
 		.attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')');
-	gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
+	gridContainer.selectAll("text").data(ticks).enter().append("text")
 		.attr("x", x)
 		.attr("dy", -3)
 		.attr("text-anchor", "middle")
 		.text(String);
 
 	// vertical grid lines
-	gridContainer.selectAll("line").data(x.ticks(10)).enter().append("line")
+	gridContainer.selectAll("line").data(ticks).enter().append("line")
 		.attr("x1", x)
 		.attr("x2", x)
 		.attr("y1", 0)
