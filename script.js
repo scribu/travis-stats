@@ -56,7 +56,8 @@ function renderBuildCounts(container, data) {
 	// bar labels
 	var labelsContainer = chart.append('g')
 		.attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')');
-		labelsContainer.selectAll('text').data(data).enter().append('text')
+
+	labelsContainer.selectAll('text').data(data).enter().append('text')
 		.attr('y', yText)
 		.attr("dy", ".35em") // vertical-align: middle
 		.attr('text-anchor', 'end')
@@ -65,6 +66,7 @@ function renderBuildCounts(container, data) {
 	// bars
 	var barsContainer = chart.append('g')
 		.attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')');
+
 	barsContainer.selectAll("rect").data(data).enter().append("rect")
 		.attr('y', y)
 		.attr('height', yScale(1))
