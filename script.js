@@ -96,11 +96,14 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 		.range([0, data.length * (barHeight+barPaddingV)]);
 	var y = function(d, i) { return yScale(i) + barPaddingV*i; };
 	var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
+
+	var maxValue = d3.max(data, barValue);
+
 	var x = d3.scaleLinear()
-		.domain([0, d3.max(data, barValue)])
+		.domain([0, maxValue])
 		.range([0, maxBarWidth]);
 
-        var maxY = yScale.domain().pop();
+	var maxY = yScale.domain().pop();
 
 	// svg container element
 	var chart = d3.select(container).html('').append("svg")
@@ -108,16 +111,40 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 		.attr('height', gridLabelHeight + gridChartOffset + data.length * (barHeight+barPaddingV*2));
 
 	// grid line labels
+	var ticks = x.ticks(10);
+
+	var f = d3.format('.1f');
+
+	function asSeconds(val) {
+		return f(val) + 's';
+	}
+
+	function asMinutes(val) {
+		return f(val / 60) + 'h';
+	}
+
+	function asHours(val) {
+		return f(val / 3600) + 'h';
+	}
+
+	if (maxValue < 2 * 60) {
+		format = asSeconds;
+	} else if (maxValue <= 3600) {
+		format = asMinutes;
+	} else {
+		format = asHours;
+	}
+
 	var gridContainer = chart.append('g')
 		.attr('transform', 'translate(' + paddingLeft + ',' + gridLabelHeight + ')');
-	gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
+	gridContainer.selectAll("text").data(ticks).enter().append("text")
 		.attr("x", x)
 		.attr("dy", -3)
 		.attr("text-anchor", "middle")
-		.text(String);
+		.text(format);
 
 	// vertical grid lines
-	gridContainer.selectAll("line").data(x.ticks(10)).enter().append("line")
+	gridContainer.selectAll("line").data(ticks).enter().append("line")
 		.attr("x1", x)
 		.attr("x2", x)
 		.attr("y1", 0)
@@ -160,17 +187,17 @@ function isValidBuild(build) {
 	return build.branch === 'master' && build.state === 'finished';
 }
 
-// Build clock time, in minutes.
+// Build clock time, in seconds.
 function getClockTime(build) {
 	var started_at = Date.parse(build.started_at);
 	var finished_at = Date.parse(build.finished_at);
 
-	return (finished_at - started_at) / 60000;
+	return (finished_at - started_at) / 1000;
 }
 
-// Build duration, in minutes.
+// Build duration, in seconds.
 function getDuration(build) {
-	return build.duration / 60;
+	return build.duration;
 }
 
 function retrieveJson(url, callback) {
