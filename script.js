@@ -291,7 +291,7 @@ function updateInputViaHash() {
 	document.getElementById('repository').value = parts[0] + '/' + parts[1]; 
 
 	if (parts[2]) {
-		document.getElementById('branch').value = parts[2];
+		document.getElementById('branch').value = parts.slice(2).join('/');
 	}
 }
 
