@@ -120,7 +120,7 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 	}
 
 	function asMinutes(val) {
-		return f(val / 60) + 'h';
+		return f(val / 60) + 'm';
 	}
 
 	function asHours(val) {
