@@ -92,8 +92,8 @@ function renderBuildTimes(container, barValue, data, baseUrl) {
 
 	// scales
 	var yScale = d3.scaleBand()
-		.domain(d3.range(0, data.length))
-		.range([0, data.length * (barHeight+barPaddingV)]);
+		.domain(d3.range(0, data.length + 1))
+		.range([0, (data.length + 1) * (barHeight+barPaddingV)]);
 	var y = function(d, i) { return yScale(i) + barPaddingV*i; };
 	var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
 
